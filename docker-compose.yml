@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: auth_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    command: ["/bin/custom-entrypoint.sh"]
+
+  app:
+    build: ./app
+    container_name: app_container
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  api:
+    build: ./api
+    container_name: api_container
+    depends_on:
+      - db
+    networks:
+      - backend
+    environment:
+      DB_USER: admin
+      DB_PASSWORD: admin_password
+      DB_NAME: auth_db
+
+volumes:
+  db_data:
+
+networks:
+  backend:
